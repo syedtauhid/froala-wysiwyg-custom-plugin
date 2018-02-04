@@ -1,0 +1,42 @@
+{
+    "_embedded": {
+        "componentDefinitionOutputClassList": [
+            {
+                "id": "com.bcv.bcm.bia.out.ApplicationDep",
+                "name": "com.bcv.bcm.bia.out.ApplicationDep.meta.name",
+                "iconName": "share-alt",
+                "description": "com.bcv.bcm.bia.out.ApplicationDep.meta.description",
+                "category": "component.out.category.dynamic",
+                "template": "/extensions/com/bcv/bcm/bia/templates/application-dependencies.hbs",
+                "query": {},
+                "allowMultiple": false,
+                "hasHeader": true,
+                "component_definition": "com.bcv.bcm.bia"
+            },
+            {
+                "id": "com.bcv.bcm.bia.out.Content",
+                "name": "com.bcv.bcm.bia.out.Content.meta.name",
+                "iconName": "font",
+                "description": "com.bcv.bcm.bia.out.Content.meta.description",
+                "category": "component.out.category.content",
+                "template": "/extensions/com/bcv/bcm/common/templates/content.hbs",
+                "query": {},
+                "allowMultiple": true,
+                "hasHeader": false,
+                "component_definition": "com.bcv.bcm.bia"
+            },
+            {
+                "id": "com.bcv.bcm.bia.out.CriticalVendorDep",
+                "name": "com.bcv.bcm.bia.out.CriticalVendorDep.meta.name",
+                "iconName": "truck",
+                "description": "com.bcv.bcm.bia.out.CriticalVendorDep.meta.description",
+                "category": "component.out.category.dynamic",
+                "template": "/extensions/com/bcv/bcm/bia/templates/critical-vendor-dependencies.hbs",
+                "query": {},
+                "allowMultiple": false,
+                "hasHeader": true,
+                "component_definition": "com.bcv.bcm.bia"
+            }
+        ]
+    }
+}

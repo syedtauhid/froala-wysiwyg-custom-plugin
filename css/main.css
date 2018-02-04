@@ -1,4 +1,8 @@
-.custom-layer {
-  text-align: center;
-  padding: 10px;
+.container {
+    margin: 0 auto;
+    width: 960px;
+}
+
+.text-center {
+    text-align: center;
 }
