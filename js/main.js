@@ -110,7 +110,7 @@ function insertElementInEditor(editor, id) {
 }
 
 // Initialize the editor.
-function initEditor() {
+function initFroalaEditor() {
     definePopupButtons();
     $('#froala-editor').froalaEditor({
         toolbarButtons: ['bold', 'italic', '|', 'customButtons'],
@@ -125,7 +125,7 @@ function getEditorCustomButtons(url) {
         $.each(classList, function (index, classItem) {
             registerCustomCommands(classItem);
         });
-        initEditor();
+        initFroalaEditor();
     });
 }
 
