@@ -1,0 +1,51 @@
+Adding to this implementation. Another API call to get the JSON data file represented by the "id". 
+Provide all fields with checkboxes; some may be preselected based on default configuration. Adding the list of the selected fields in the tag.
+
+1. Select the content type as you've done
+2. query and return the content
+3. provide a checkbox select of the fields in the content type
+4. allow user to select which fields they want to build table with
+5. provide a table with listed columns
+6 inject the handlebars template as indicated by id
+The template does not need to be executed in the WYSIWYG.
+Only when it is previewd
+makes sense?
+
+Yes to both.
+So for #2, assume API exist and you only have to inject the Handlebars template
+once you've done #4, use selected fields to populate the handlebars template
+
+
+<div class="sectionContainer">
+    <table>
+        <tr>
+            <th>{{ translate 'com.bconview.bcm.bcp.ExternalCustomers.fld.recoverableFunction' }}</th>
+            <th>{{ translate 'com.bconview.bcm.bcp.ExternalCustomers.fld.customers.customer' }}</th>
+            <th>{{ translate 'com.bconview.bcm.bcp.ExternalCustomers.fld.customers.rating' }}</th>
+            <th>{{ translate 'com.bconview.bcm.bcp.ExternalCustomers.fld.customers.description' }}</th>
+        </tr>
+        {{#each inputs}}
+            {{#with data}}
+                {{#if customers}}
+                    {{#each customers}}
+                        <tr>
+                            {{#if @first}}
+                                <td rowspan="{{../customers.size}}">{{ ../recoverableFunction.label }}</td>
+                            {{/if}}
+                            <td>{{ customer.label }}</td>
+                            <td>{{ translate rating.label }}</td>
+                            <td>{{ description }}</td>
+                        </tr>
+                    {{/each}}
+                {{^}}
+                    <tr>
+                        <td>{{ recoverableFunction.label }}</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                {{/if}}
+            {{/with}}
+        {{/each}}
+    </table>
+</div>

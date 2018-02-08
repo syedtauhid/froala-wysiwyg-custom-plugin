@@ -1,0 +1,84 @@
+Let me give you a more concrete examples.
+Heres the definition for External Customer:
+
+{
+    "recoverableFunction": {
+        "type": "link",
+        "label": "com.bconview.bcm.bcp.ExternalCustomers.fld.recoverableFunction",
+        "helpText": "com.bconview.bcm.bcp.ExternalCustomers.fld.recoverableFunction.help",
+        "linkLabel": "function",
+        "resourceType": "com.bconview.bcm.bcp.RecoverableFunction",
+        "component": "com.bconview.bcm.bcp",
+        "required": true
+    },
+    "customers": {
+        "type": "embedded_list",
+        "label": "com.bconview.bcm.bcp.ExternalCustomers.fld.customers",
+        "helpText": "com.bconview.bcm.bcp.ExternalCustomers.fld.customers.help",
+        "template": "{{customer.label}}",
+        "schema": {
+            "customer": {
+                "type": "link",
+                "label": "com.bconview.bcm.bcp.ExternalCustomers.fld.customers.customer",
+                "linkLabel": "customer",
+                "resourceType": "com.bconview.bcm.Customer",
+                "linkScope": "WS_AND_HIERARCHY",
+                "component": "com.bconview.bcm.catalog",
+                "required": true
+            },
+            "rating": {
+                "type": "choice",
+                "required": true,
+                "label": "com.bconview.bcm.bcp.ExternalCustomers.fld.customers.rating",
+                "choices": {
+                    "$type": "conf",
+                    "path": "$.criticalityLevels"
+                }
+            },
+            "description": {
+                "type": "text",
+                "label": "com.bconview.bcm.bcp.ExternalCustomers.fld.customers.description",
+                "multiline": true
+            }
+        }
+    }
+}
+
+Fields are: recoverableFunction, customers (list of customers), rating, description
+here's the handlebars template:
+<!--
+  - inputs: com.bconview.bcm.bcp.ExternalCustomers
+  -->
+<div class="sectionContainer">
+    <table>
+        <tr>
+            <th>{{ translate 'com.bconview.bcm.bcp.ExternalCustomers.fld.recoverableFunction' }}</th>
+            <th>{{ translate 'com.bconview.bcm.bcp.ExternalCustomers.fld.customers.customer' }}</th>
+            <th>{{ translate 'com.bconview.bcm.bcp.ExternalCustomers.fld.customers.rating' }}</th>
+            <th>{{ translate 'com.bconview.bcm.bcp.ExternalCustomers.fld.customers.description' }}</th>
+        </tr>
+        {{#each inputs}}
+            {{#with data}}
+                {{#if customers}}
+                    {{#each customers}}
+                        <tr>
+                            {{#if @first}}
+                                <td rowspan="{{../customers.size}}">{{ ../recoverableFunction.label }}</td>
+                            {{/if}}
+                            <td>{{ customer.label }}</td>
+                            <td>{{ translate rating.label }}</td>
+                            <td>{{ description }}</td>
+                        </tr>
+                    {{/each}}
+                {{^}}
+                    <tr>
+                        <td>{{ recoverableFunction.label }}</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                {{/if}}
+            {{/with}}
+        {{/each}}
+    </table>
+Assume API call returns type (you've done this already)
