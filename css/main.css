@@ -6,3 +6,31 @@
 .text-center {
     text-align: center;
 }
+
+.checkbox-container {
+    display: flow-root;
+}
+
+.table-content-checkbox-container {
+    width: 60%;
+    float: left;
+}
+
+.sortby-checkbox-container {
+    width: 40%;
+    float: right;
+    padding: 5px;
+    background-color: #f9f9f9;
+}
+
+.checkbox-group  .checkbox {
+    margin-left: 10px;
+}
+
+span.title{
+    font-weight: bold;
+}
+.checkbox-group span.title {
+    font-weight: normal;
+    text-transform: uppercase;
+}

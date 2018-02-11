@@ -81,4 +81,5 @@ here's the handlebars template:
             {{/with}}
         {{/each}}
     </table>
+<div>
 Assume API call returns type (you've done this already)

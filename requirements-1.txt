@@ -49,3 +49,28 @@ once you've done #4, use selected fields to populate the handlebars template
         {{/each}}
     </table>
 </div>
+
+< = &lt;
+> = &gt;
+
+
+            // var table = template.find("table");
+            // $(checkboxContainerId + ' input:checkbox:not(:checked)').each(function() {
+            //     var nth = this.value;
+            //     console.log("<<<nth: " + nth);
+            //     table.find('td:nth-child('+ nth +'),th:nth-child('+ nth +')').remove();
+            //     console.log(table[0].outerHTML);
+            // });
+            // template.html(table);
+            // template = template.html();
+            // template = template.replace(/</g, "&lt;");
+            // template = template.replace(/>/g, "&gt;");
+            // <bcv:output id="iejhdoeiuhehiou8762p0" params="sortBy:$.name.last,threashhold:300" contenteditable="false" />;
+
+<bcv:resources fqn="com.bconview.bcm.bia.EssentialFunction"
+               scope="WS_AND_CHILDREN"
+               columns="$.detail.function.label,$.impacts.qualitative.mtpd,$.impacts.quantitative.mtpd"
+		     SortBy="2"
+contenteditable="false" />
+
+["fullName", "contacts" : [""], ]

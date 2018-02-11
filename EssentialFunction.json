@@ -1,0 +1,117 @@
+{
+  "details": {
+    "type": "embedded",
+    "label": "com.bconview.bcm.bia.EssentialFunction.fld.details",
+    "schema": {
+      "name": {
+        "type": "text",
+        "label": "com.bconview.bcm.bia.EssentialFunction.fld.details.name",
+        "required": true
+      },
+      "description": {
+        "type": "text",
+        "label": "com.bconview.bcm.bia.EssentialFunction.fld.details.description",
+        "multiline": true,
+        "required": true
+      },
+      "function": {
+        "type": "link",
+        "label": "com.bconview.bcm.bia.EssentialFunction.fld.details.function",
+        "helpText": "com.bconview.bcm.bia.EssentialFunction.fld.details.function.help",
+        "linkLabel": "function",
+        "resourceType": "com.bconview.bcm.Function",
+        "linkScope": "WS_AND_HIERARCHY",
+        "component": "com.bconview.bcm.catalog",
+        "required": false
+      },
+      "location": {
+        "type": "link",
+        "label": "com.bconview.bcm.bia.EssentialFunction.fld.details.location",
+        "helpText": "com.bconview.bcm.bia.EssentialFunction.fld.details.location.help",
+        "linkLabel": "located",
+        "resourceType": "com.bconview.bcm.Location",
+        "linkScope": "WS_AND_HIERARCHY",
+        "component": "com.bconview.bcm.catalog",
+        "required": true
+      },
+      "owner": {
+        "type": "links",
+        "label": "com.bconview.bcm.bia.EssentialFunction.fld.details.owner",
+        "helpText": "com.bconview.bcm.bia.EssentialFunction.fld.details.owner.help",
+        "linkLabel": "located",
+        "resourceType": "com.bconview.bcm.Personnel",
+        "linkScope": "WS_AND_HIERARCHY",
+        "component": "com.bconview.bcm.catalog",
+        "required": true
+      },
+      "required": {
+        "type": "links",
+        "label": "com.bconview.bcm.bia.EssentialFunction.fld.details.required",
+        "helpText": "com.bconview.bcm.bia.EssentialFunction.fld.details.required.help",
+        "linkLabel": "depends",
+        "resourceType": "com.bconview.bcm.bia.EssentialFunction",
+        "linkScope": "WS_ONLY",
+        "component": "com.bconview.bcm.bia",
+        "required": false
+      }
+    }
+  },
+  "qualitativeImpacts": {
+    "type": "embedded",
+    "header": "com.bconview.bcm.bia.EssentialFunction.fld.qualitativeImpacts",
+    "schema": {
+      "impacts": {
+        "type": "impacts",
+        "label": "com.bconview.bcm.bia.EssentialFunction.fld.qualitativeImpacts",
+        "helpText": "com.bconview.bcm.bia.EssentialFunction.fld.qualitativeImpacts.help",
+        "cellType": "number",
+        "maximum": 5,
+        "minimum": 0,
+        "categories": {
+          "$type": "conf",
+          "path": "$.impactCategories"
+        },
+        "timeframes": {
+          "$type": "conf",
+          "path": "$.impactTimeframes"
+        }
+      }
+    }
+  },
+  "quantitativeImpacts": {
+    "type": "embedded",
+    "header": "com.bconview.bcm.bia.EssentialFunction.fld.quantitativeImpacts",
+    "schema": {
+      "impacts": {
+        "type": "impacts",
+        "label": "com.bconview.bcm.bia.EssentialFunction.fld.quantitativeImpacts",
+        "helpText": "com.bconview.bcm.bia.EssentialFunction.fld.quantitativeImpacts.help",
+        "cellType": "currency",
+        "categories": {
+          "$type": "conf",
+          "path": "$.impactCategories"
+        },
+        "timeframes":  {
+          "$type": "conf",
+          "path": "$.impactTimeframes"
+        }
+      }
+    }
+  },
+  "recovery": {
+    "type": "embedded",
+    "schema": {
+      "criticality": {
+        "type": "choice",
+        "choices": {
+          "$type": "conf",
+          "path": "$.criticalityLevels"
+        },
+        "required": true
+      },
+      "rto": {
+        "type": "duration"
+      }
+    }
+  }
+}
