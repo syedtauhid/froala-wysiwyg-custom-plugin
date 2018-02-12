@@ -25,11 +25,12 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
         $.FroalaEditor.RegisterCommand('custom_dropdown', {
           title: 'Advanced options',
           type: 'dropdown',
-          focus: false,
+          focus: true,
           undo: true,
           refreshAfterCallback: true,
           options: this.optionList,
           callback: function (cmd, val) {
+              this.selection.save();
               insertElementInEditor(this, val);
           }
         });
@@ -57,21 +58,25 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
         prepareAndShowShortbyCheckboxes();
 
         //show modal
-        var modal = $(modalId).modal({backdrop: "static", keyboard: false});
+        let modal = $(modalId).modal({backdrop: "static", keyboard: false});
         $(modalTitleId).html(type);
+        modal.show();
+
+        //Set submit button action
         $(submitButtonId).on('click', function(){
             var columns = getAllSelectedCheckboxList(checkboxContainerId);
             var sortBy = getAllSelectedCheckboxList(sortBycheckboxContainerID);
             var scope = gellScopeFromSelection(columns, data);
             var template = prepareTemplateWithData(type, scope, columns, sortBy);
-            console.log(template);
+            editor.selection.restore();
             editor.html.insert(template);
             editor.undo.saveStep();
             addEventListenerForEdit(template);
             $(modalId).modal('hide');
-            $(this).prop('onclick',null).off('click');
         });
-        modal.show();
+        modal.on('hidden.bs.modal', function () {
+            disposeAllActions();
+        });
     }
 
     var showModalAndUpdateTable = function(type, jsonData, selectedColumns, selectedSortby, $element) {
@@ -90,6 +95,8 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
         //show modal
         var modal = $(modalId).modal({backdrop: "static", keyboard: false});
         $(modalTitleId).html(type);
+        modal.show();
+
         $(submitButtonId).on('click', function(){
             var columns = getAllSelectedCheckboxList(checkboxContainerId);
             var sortBy = getAllSelectedCheckboxList(sortBycheckboxContainerID);
@@ -99,7 +106,10 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
             $element.attr("sortBy", sortBy);
             $(modalId).modal('hide');
         });
-        modal.show();
+
+        modal.on('hidden.bs.modal', function () {
+            disposeAllActions();
+        });
     }
 
     var prepareCheckboxContents = function(data) {
@@ -123,6 +133,7 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
 
     var prepareCheckboxFields = function(contents) {
         var checkboxFields= [];
+        $(checkboxContainerId).html("");
         $.each(contents, function (index, content) {
             var checkboxField;
             if(typeof(content) === "object"){
@@ -155,7 +166,8 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
             $(sortBycheckboxContainerID + ' input:checked').each(function(){
                 currentlyChosenValues.push(this.value);
             });
-            $(checkboxContainerId + ' input:checked').each(function() {
+            var $columnSelected= $(checkboxContainerId + ' input:checked');
+            $columnSelected.each(function() {
                 var value = this.value;
                 var path = value;
 
@@ -163,7 +175,7 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
                     value = path.split(".");
                     value = value[value.length - 1];
                 }
-                checkboxField = getCheckboxElem(path, value);
+                checkboxField = getRadioElem(path, value);
                 checkboxFields.push(checkboxField);
             });
 
@@ -171,18 +183,20 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
             $.each(currentlyChosenValues, function(index, val){
                 $(sortBycheckboxContainerID + ' input[value="'+ val +'"]').prop('checked', true);
             });
+            $columnSelected.length ? $(submitButtonId).prop('disabled', false) : $(submitButtonId).prop('disabled', true);
         });
     }
 
     var addEventListenerForEdit = function() {
         $(this.editorId + " a.table-data").on('click', function(){
-            var $parent = $(this).parent();
-            var columnList = $parent.attr("columns").split(",");
-            var sortbyList = $parent.attr("sortBy").split(",");
-            var type = $parent.attr("fqn");
+            var $elem = $(this).parent();
+            //var $elem = $parent.find("bcv-resources" );
+            var columnList = $elem.attr("columns").split(",");
+            var sortbyList = $elem.attr("sortBy").split(",");
+            var type = $elem.attr("fqn");
             var jsonData = getTableDataBasedOnType(type);
 
-            showModalAndUpdateTable(type, jsonData, columnList, sortbyList, $parent);
+            showModalAndUpdateTable(type, jsonData, columnList, sortbyList, $elem);
         });
     }
 
@@ -216,8 +230,18 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
         return template;
     }
 
+    var disposeAllActions = function() {
+        $(checkboxContainerId + ' input:checkbox').prop('change', null).off('change');
+        $(submitButtonId).prop('onclick',null).off('click');
+        $(submitButtonId).prop('disabled', true);
+    }
+
     var getCheckboxElem = function(val, label) {
         return '<div class="checkbox">' + '<label><input type="checkbox" value="'+ val +'">'+ label +'</label>' + "</div>";
+    }
+
+    var getRadioElem = function(val, label) {
+        return '<div class="radio">' + '<label><input type="radio" name="sortby" value="'+ val +'">'+ label +'</label>' + "</div>";
     }
     
     // Initialize the editor.
