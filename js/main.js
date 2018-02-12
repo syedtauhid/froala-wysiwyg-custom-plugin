@@ -60,15 +60,20 @@ var jsonData = {
     }
   };
 
-var customFroalaEditorBuilder;
+
 //for test purpose Handlebar Template 
-function openPreviewModal() {
-  var html = $('div#froala-editor').froalaEditor('html.get');
-  // html = html.replace(/&lt;/g, "<");
-  // html = html.replace(/&gt;/g, ">");
-  var template = Handlebars.compile(html);
-  html = template(jsonData);
-  console.log(html);
+var defaultHandlebarTemplate =
+  '<bcv-resources fqn="{{type}}" scope="{{scope}}" columns="{{columns}}" sortBy="{{sortBy}}" contenteditable="false">' +
+  '<a class="table-data"> BCV Content: {{type}} </a> </bcv-resources>';
+
+//CustomFroalaEditorBuilder object
+var customFroalaEditorBuilder;
+
+//Get the html and open the preview modal
+function openPreviewModal() {  
+  var html = customFroalaEditorBuilder.getEditorHTML();
+  $('#preview-handlebars-temp textarea').val(html);
+  $("#previewModal").modal('show');
 }
 
 $(function () {

@@ -34,3 +34,8 @@ span.title{
     font-weight: normal;
     text-transform: uppercase;
 }
+
+#preview-handlebars-temp textarea{
+    min-width: 100%; 
+    min-height: 200px;
+}
