@@ -23,23 +23,61 @@
 
   <!-- Preview Modal -->
   <div class="modal fade" id="previewModal" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
-            <h4 class="modal-title">Compiled Handlebars Template</h4>
-          </div>
-          <div class="modal-body">
-            <div id="preview-handlebars-temp"><textarea class="form-control"></textarea></div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-dismiss="modal">close</button>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+          <h4 class="modal-title">Compiled Handlebars Template</h4>
+        </div>
+        <div class="modal-body">
+          <div id="preview-handlebars-temp">
+            <textarea class="form-control"></textarea>
           </div>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">close</button>
+        </div>
       </div>
-    </div>  
+    </div>
+  </div>
 
-    <!-- Checkbox Modal -->
+  <!-- Selection Modal -->
+  <div class="modal fade" id="selectionModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">What you want to insert?</h4>
+        </div>
+        <div class="modal-body">
+          <div id="choose-insert-type">
+            <div class="form-group">
+              <label for="selectInsertType">Choose Insert Type:</label>
+              <select class="form-control" id="selectInsertType">
+                <option>-- select --</option>
+                <option value="0">Insert Content Types</option>
+                <option value="1">Insert From Template</option>
+              </select>
+            </div>
+          </div>
+          <div id="choose-types" class="hidden">
+            <div class="form-group">
+              <label for="selectContentType">Select types:</label>
+              <select class="form-control" id="selectContentType">
+                <option value="none">-- select --</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="submit-insert-type" class="btn btn-primary" disabled>Next</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkbox Modal -->
   <div class="modal fade" id="checkboxModal" role="dialog">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -57,6 +95,10 @@
                 <span class="title"> Sort By: </span>
                 <div id="sortby-checkbox-group"></div>
               </div>
+          </div>
+          <div class="ratio-group-container hidden">
+              <span class="title"> Select Template: </span>
+              <div id="select-template-ratio"></div>
           </div>
         </div>
         <div class="modal-footer">

@@ -10,7 +10,8 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
     this.pluginsEnabled = pluginsEnabled;
     this.apiUrl = apiUrl;
     this.optionList = {};
-    this.handlebarTemplate = "";
+    this.contentByTypeTemplate = "";
+    this.contentByTemplate = "";
 
     // Temp Variables
     var checkboxContainerId = "#table-content-checkbox";
@@ -18,12 +19,21 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
     var submitButtonId = "#submit-table-data";
     var modalId = "#checkboxModal";
     var modalTitleId = modalId + " .modal-title";
+    var selectionModalId = "#selectionModal";
+    var selectInsertTypeId = selectionModalId + " select#selectInsertType";
+    var selectContentTypeId = selectionModalId + " select#selectContentType";
+    var selectTypeContainerId = selectionModalId + " #choose-types";
+    var submitInsertTypeBtnId = selectionModalId + " #submit-insert-type";
+
+    var checkboxContainerClass = ".checkbox-container"
+    var ratioBtnContainerClass = ".ratio-group-container";
+    var selectTemplateContainerId = ratioBtnContainerClass + " #select-template-ratio";
 
     // Define Custon Dropdown
     var defineCustomDropdown = function () {
-        $.FroalaEditor.DefineIcon('custom_dropdown', {NAME: 'cog'});
+        $.FroalaEditor.DefineIcon('custom_dropdown', {NAME: 'angle-double-down'});
         $.FroalaEditor.RegisterCommand('custom_dropdown', {
-          title: 'Advanced options',
+          title: 'Insert BCV Content',
           type: 'dropdown',
           focus: true,
           undo: true,
@@ -36,12 +46,180 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
         });
         this.toolbarButtons.push('custom_dropdown');
     }
+
+    var defineCustomButton = function() {
+        $.FroalaEditor.DefineIcon('insert_BCV', {NAME: 'plus-square'});
+        $.FroalaEditor.RegisterCommand('insert_BCV', {
+            title: 'Insert BCV Content',
+            focus: true,
+            undo: true,
+            refreshAfterCallback: true,
+            callback: function () {
+                this.selection.save();
+                openSelectionModal(this);
+            }
+        });
+        this.toolbarButtons.push('insert_BCV');
+    }
     
-    // Register Custom Commands
-    var registerCustomCommands = function(item) {
-        var val = "<i class='fa fa-" + item.iconName + "'></i> " + item.name;
-        var key =  item.id;
-        this.optionList[key] = val;
+    /***** DATA  ******/
+    var jsonContentType = {
+        "_embedded": {
+            "componentDefinitionOutputClassList": [
+                {
+                    "id": "com.bcv.bcm.bia.out.ApplicationDep",
+                    "name": "ApplicationDep",
+                    "iconName": "share-alt",
+                    "description": "com.bcv.bcm.bia.out.ApplicationDep.meta.description",
+                    "category": "component.out.category.dynamic",
+                    "template": "/extensions/com/bcv/bcm/bia/templates/application-dependencies.hbs",
+                    "query": {},
+                    "allowMultiple": false,
+                    "hasHeader": true,
+                    "component_definition": "com.bcv.bcm.bia"
+                },
+                {
+                    "id": "com.bcv.bcm.bia.out.Content",
+                    "name": "Content",
+                    "iconName": "font",
+                    "description": "com.bcv.bcm.bia.out.Content.meta.description",
+                    "category": "component.out.category.content",
+                    "template": "/extensions/com/bcv/bcm/common/templates/content.hbs",
+                    "query": {},
+                    "allowMultiple": true,
+                    "hasHeader": false,
+                    "component_definition": "com.bcv.bcm.bia"
+                },
+                {
+                    "id": "com.bcv.bcm.bia.out.CriticalVendorDep",
+                    "name": "CriticalVendorDep",
+                    "iconName": "truck",
+                    "description": "com.bcv.bcm.bia.out.CriticalVendorDep.meta.description",
+                    "category": "component.out.category.dynamic",
+                    "template": "/extensions/com/bcv/bcm/bia/templates/critical-vendor-dependencies.hbs",
+                    "query": {},
+                    "allowMultiple": false,
+                    "hasHeader": true,
+                    "component_definition": "com.bcv.bcm.bia"
+                }
+            ]
+        }
+    };
+
+    var openSelectionModal = function(editor) {
+        let modal = $(selectionModalId).modal({backdrop: "static", keyboard: false});
+        $(selectInsertTypeId).change(function(){
+            if(this.value == 0){
+                prepareAndAddTypeList();
+                $(selectTypeContainerId).removeClass('hidden');
+                if($(selectContentTypeId).val() != "none")
+                    $(submitInsertTypeBtnId).prop('disabled', false);
+            } else if(this.value == 1) {
+                $(submitInsertTypeBtnId).prop('disabled', false);
+                $(selectTypeContainerId).addClass('hidden');
+            } else {
+                $(submitInsertTypeBtnId).prop('disabled', true);
+            }
+
+        });
+
+        //adding action to submit button
+        $(submitInsertTypeBtnId).click(function(){
+            $(selectionModalId).modal('hide');
+            let insertType = $(selectInsertTypeId).val();
+            if(insertType == 0) {
+                let type = $(selectContentTypeId).val();
+                insertElementInEditor(editor, type);
+            } else {
+                showModalForChoosingTemplate(editor);
+            }
+            $(this).prop('onclick',null).off('click');
+        });
+        
+    }
+
+    var prepareAndAddTypeList = function() {
+        if($(selectContentTypeId + " option").length > 1) return;
+
+        var types = getTypeList();
+        $.each(types, function (i, item) {
+            var text = item.name;
+            var value =  item.id;
+            $(selectContentTypeId).append($('<option>', { 
+                value: value,
+                text : text 
+            }));
+        });
+        $(selectContentTypeId).change(function(){
+            if(this.value != "none")
+                $(submitInsertTypeBtnId).prop('disabled', false);
+        });
+    }
+
+    var getTypeList = function() {
+        var classList = jsonContentType._embedded.componentDefinitionOutputClassList;
+        return classList;
+    }
+
+    // Using the same json for template list
+    var prepareTemplateListContents = function() {
+        return getTypeList();
+    }
+
+    var showModalForChoosingTemplate = function(editor, selectedVal, $element){
+        $(checkboxContainerClass).addClass("hidden");
+        $(ratioBtnContainerClass).removeClass("hidden");
+
+        var contents = prepareTemplateListContents();
+        var checkboxFields = prepareRationBtnFields(contents);
+
+        $(selectTemplateContainerId).html(checkboxFields);
+        $(selectTemplateContainerId + " input:radio").change(function(){
+            $(submitButtonId).prop('disabled', false);
+        });
+        if(selectedVal)
+            $(selectTemplateContainerId + ' input[value="'+ selectedVal +'"]').prop('checked', true);
+
+        //show modal
+        let modal = $(modalId).modal({backdrop: "static", keyboard: false});
+        $(modalTitleId).html("Select Template Ids");
+        modal.show();
+
+        $(submitButtonId).click(function(){
+            let id =  $(selectTemplateContainerId + ' input:checked').val();
+            if(selectedVal) {
+                $element.parent().attr('dataId', id);
+                $element.html('BCV template: ' + id);
+            } else {
+                let template = prepareHtmlForInsertTemplate(id);
+                editor.selection.restore();
+                editor.html.insert(template);
+                editor.undo.saveStep();
+                addEventListenerForEdit();
+            }
+            $(modalId).modal('hide');
+            $(this).prop('onclick',null).off('click');
+        });
+
+        modal.on('hidden.bs.modal', function(){
+            $(ratioBtnContainerClass).addClass("hidden");
+            $(checkboxContainerClass).removeClass("hidden");
+        });
+    }
+
+    var prepareHtmlForInsertTemplate = function(id) {
+        let template = this.contentByTemplate;
+        template = template.replace(/{{id}}/g, id);
+        return template;
+    }
+
+    var prepareRationBtnFields = function(contents) {
+        var fields = [];
+        $.each(contents, function (i, item) {
+           let elem = getRadioElem(item.id, item.name);
+           fields.push(elem);
+        });
+        return fields;
     }
     
     // Insert the custom element in Editor
@@ -50,6 +228,7 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
         showModalAndInsertTable(editor, data, type);
     }
 
+    //show modal for insert
     var showModalAndInsertTable = function(editor, data, type) {
         var contents = prepareCheckboxContents(data);
         var checkboxFields = prepareCheckboxFields(contents);
@@ -71,7 +250,7 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
             editor.selection.restore();
             editor.html.insert(template);
             editor.undo.saveStep();
-            addEventListenerForEdit(template);
+            addEventListenerForEdit();
             $(modalId).modal('hide');
         });
         modal.on('hidden.bs.modal', function () {
@@ -79,6 +258,7 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
         });
     }
 
+    // show modal for update
     var showModalAndUpdateTable = function(type, jsonData, selectedColumns, selectedSortby, $element) {
         var contents = prepareCheckboxContents(jsonData);
         var checkboxFields = prepareCheckboxFields(contents);
@@ -188,15 +368,20 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
     }
 
     var addEventListenerForEdit = function() {
-        $(this.editorId + " a.table-data").on('click', function(){
+        $(this.editorId + " a.table-data").click(function(){
             var $elem = $(this).parent();
             //var $elem = $parent.find("bcv-resources" );
-            var columnList = $elem.attr("columns").split(",");
-            var sortbyList = $elem.attr("sortBy").split(",");
-            var type = $elem.attr("fqn");
-            var jsonData = getTableDataBasedOnType(type);
+            if($elem.attr('dataId')) {
+                let id = $elem.attr('dataId');
+                showModalForChoosingTemplate(null, id, $(this));
+            } else {
+                var columnList = $elem.attr("columns").split(",");
+                var sortbyList = $elem.attr("sortBy").split(",");
+                var type = $elem.attr("fqn");
+                var jsonData = getTableDataBasedOnType(type);
 
-            showModalAndUpdateTable(type, jsonData, columnList, sortbyList, $elem);
+                showModalAndUpdateTable(type, jsonData, columnList, sortbyList, $elem);
+            }
         });
     }
 
@@ -221,7 +406,7 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
     }
 
     var prepareTemplateWithData = function(type, scope, columns, sortBy) {
-        var template = this.handlebarTemplate;
+        var template = this.contentByTypeTemplate;
         template = template.replace(/{{type}}/g, type);
         template = template.replace(/{{scope}}/g, scope);
         template = template.replace(/{{columns}}/g, columns);
@@ -246,16 +431,14 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
     
     // Initialize the editor.
     var initFroalaEditor = function () {
-        defineCustomDropdown();
+        // defineCustomDropdown();
+        defineCustomButton();
         $(this.editorId).froalaEditor({
           toolbarButtons: this.toolbarButtons,
-          pluginsEnabled: this.pluginsEnabled,
-          htmlAllowedEmptyTags: [
-            "a",
-            "bcv-output",
-            "bcv-resources"
-          ],
-          htmlAllowedTags: ["bcv-resources", "a"],
+        //pluginsEnabled: this.pluginsEnabled,
+          htmlAllowedEmptyTags: ['textarea', 'a', 'iframe', 'object', 'video', 'style', '.fa', 'span', 'p', 'path', 'line',
+                                       'h1', 'h2', 'h3', 'h4','bcv-output','bcv-resources','bcv-template'],
+          htmlAllowedTags: [".*"],
           htmlAllowedAttrs: [".*"],
           htmlRemoveTags: ["script"]
         });
@@ -269,19 +452,32 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
     }
 
     var getHandlebarTemplate = function() {
-        setHandlebarTemplate(defaultHandlebarTemplate);
+        setContentByTypeTemplate(defaultContentByTypeTemplate);
+        setContentByTemplate(defaultContentByTempale);
     }
 
-    var setHandlebarTemplate = function(data) {
-        this.handlebarTemplate = data;
+    var setContentByTypeTemplate = function(data) {
+        this.contentByTypeTemplate = data;
     }
+
+    var setContentByTemplate = function(data){
+        this.contentByTemplate = data;
+    } 
 
     var getEditorHTML = function(){
         return $(editorId).froalaEditor('html.get');
     }
+
+    // Register Custom Commands
+    var registerCustomCommands = function(item) {
+        var val = "<i class='fa fa-" + item.iconName + "'></i> " + item.name;
+        var key =  item.id;
+        this.optionList[key] = val;
+    }
     
     // Fetch Custom Buttons Data 
-    var getEditorCustomOptions = function() {
+  /**
+     var getEditorCustomOptions = function() {
         $.getJSON(this.apiUrl, function (data) {
             var classList = data._embedded.componentDefinitionOutputClassList;
             $.each(classList, function (index, classItem) {
@@ -290,9 +486,21 @@ var CustomFroalaEditorBuilder = function(editorId, toolbarButtons, pluginsEnable
             initFroalaEditor();
         }, function(err){console.log(err)});
     }
-
+    **/
+  
+     // Fetch Custom Buttons Data - From String "jsonContentType"
+    var getEditorCustomOptions = function() {
+            var classList = jsonContentType._embedded.componentDefinitionOutputClassList;
+            $.each(classList, function (index, classItem) {
+            //  console.log(classItem);
+                registerCustomCommands(classItem);
+            });
+            initFroalaEditor();
+    }
+    
     var init = function(){
-        getEditorCustomOptions();
+        // getEditorCustomOptions();
+        initFroalaEditor();
         getHandlebarTemplate();
     }
     

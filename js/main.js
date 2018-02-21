@@ -62,9 +62,11 @@ var jsonData = {
 
 
 //for test purpose Handlebar Template 
-var defaultHandlebarTemplate =
+var defaultContentByTypeTemplate =
   '<bcv-resources fqn="{{type}}" scope="{{scope}}" columns="{{columns}}" sortBy="{{sortBy}}" contenteditable="false">' +
   '<a class="table-data"> BCV Content: {{type}} </a> </bcv-resources><br />';
+
+var defaultContentByTempale = '<bcv-template dataId="{{id}}"> <a class="table-data"> BCV template: {{id}} </a> </bcv-template>';
 
 //CustomFroalaEditorBuilder object
 var customFroalaEditorBuilder;
